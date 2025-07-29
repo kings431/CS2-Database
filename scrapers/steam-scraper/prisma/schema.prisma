@@ -1,0 +1,55 @@
+// This file references the main database schema
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:C:/Users/marc_/OneDrive/Desktop/CS2-Database/prisma/dev.db"
+}
+
+// Reference the main schema models
+model Item {
+  id            String   @id @default(cuid())
+  name          String
+  marketHashName String  @unique
+  rarity        String
+  category      String
+  iconUrl       String?
+  inspectLink   String?
+  weapon        String?
+  skin          String?
+  collection    String?
+  source        String?
+  float         Float?
+  wear          String?
+  pattern       Int?
+  isStatTrak    Boolean  @default(false)
+  isSouvenir    Boolean  @default(false)
+  isNormal      Boolean  @default(true)
+  age           String?
+  steamPrice    Float?
+  buffPrice     Float?
+  csMoneyPrice  Float?
+  bitskinsPrice Float?
+  lastUpdated   DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  stickers Sticker[]
+  charms   Charm[]
+}
+
+model Sticker {
+  id     String @id @default(cuid())
+  name   String
+  slot   Int
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+}
+
+model Charm {
+  id     String @id @default(cuid())
+  name   String
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
+} 
