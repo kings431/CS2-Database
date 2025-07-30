@@ -42,8 +42,8 @@ interface WhereClause {
   collection?: string
   source?: string
   age?: {
-    gte?: number
-    lte?: number
+    gte?: string
+    lte?: string
   }
   stickers?: {
     some: {
@@ -110,8 +110,8 @@ export async function getFilteredSkins(filters: SkinFilter) {
   // Age
   if (filters.minAge !== undefined || filters.maxAge !== undefined) {
     where.age = {}
-    if (filters.minAge !== undefined) where.age.gte = filters.minAge
-    if (filters.maxAge !== undefined) where.age.lte = filters.maxAge
+    if (filters.minAge !== undefined) where.age.gte = filters.minAge.toString()
+    if (filters.maxAge !== undefined) where.age.lte = filters.maxAge.toString()
   }
 
   // Price - This is a complex query that needs special handling
@@ -193,7 +193,7 @@ export async function seedSampleData() {
       isStatTrak: false,
       isSouvenir: false,
       isNormal: true,
-      age: 120,
+      age: "120",
       steamPrice: 15000.00,
       buffPrice: 14500.00,
       csMoneyPrice: 14800.00,
@@ -214,7 +214,7 @@ export async function seedSampleData() {
       isStatTrak: true,
       isSouvenir: false,
       isNormal: false,
-      age: 90,
+      age: "90",
       steamPrice: 13000.00,
       buffPrice: 12800.00,
       csMoneyPrice: 12900.00,
@@ -235,7 +235,7 @@ export async function seedSampleData() {
       isStatTrak: false,
       isSouvenir: false,
       isNormal: true,
-      age: 150,
+      age: "150",
       steamPrice: 9000.00,
       buffPrice: 8800.00,
       csMoneyPrice: 8900.00,

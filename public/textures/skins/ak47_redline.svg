@@ -1,0 +1,12 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="redline" patternUnits="userSpaceOnUse" width="64" height="64">
+      <rect width="64" height="64" fill="#1a1a1a"/>
+      <rect x="0" y="0" width="32" height="32" fill="#8B0000"/>
+      <rect x="32" y="32" width="32" height="32" fill="#8B0000"/>
+      <rect x="16" y="16" width="32" height="32" fill="#DC143C"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#redline)"/>
+  <rect x="0" y="0" width="512" height="512" fill="none" stroke="#333" stroke-width="2"/>
+</svg> 

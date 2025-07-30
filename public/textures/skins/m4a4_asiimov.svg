@@ -1,0 +1,15 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="m4asiimov" patternUnits="userSpaceOnUse" width="64" height="64">
+      <rect width="64" height="64" fill="#FFD700"/>
+      <rect x="0" y="0" width="32" height="32" fill="#FF6347"/>
+      <rect x="32" y="32" width="32" height="32" fill="#FF6347"/>
+      <rect x="16" y="16" width="32" height="32" fill="#FF4500"/>
+      <circle cx="32" cy="32" r="8" fill="#FFD700"/>
+      <path d="M24,24 Q32,16 40,24 Q32,32 24,24" fill="#FF6347"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#m4asiimov)"/>
+  <rect x="128" y="128" width="256" height="64" fill="#FFD700" stroke="#000" stroke-width="2"/>
+  <text x="256" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#000">M4A4 | ASIIMOV</text>
+</svg> 

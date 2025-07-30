@@ -1,0 +1,13 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="mirage" patternUnits="userSpaceOnUse" width="128" height="128">
+      <rect width="128" height="128" fill="#F4A460"/>
+      <rect x="0" y="0" width="64" height="64" fill="#DAA520"/>
+      <rect x="64" y="64" width="64" height="64" fill="#DAA520"/>
+      <rect x="32" y="32" width="64" height="64" fill="#F5DEB3"/>
+      <polygon points="64,32 80,48 64,64 48,48" fill="#8B4513"/>
+    </pattern>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#mirage)"/>
+  <text x="512" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#8B4513">de_mirage</text>
+</svg> 

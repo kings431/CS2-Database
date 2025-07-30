@@ -1,0 +1,14 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="ominous" patternUnits="userSpaceOnUse" width="64" height="64">
+      <rect width="64" height="64" fill="#2F4F4F"/>
+      <rect x="0" y="0" width="32" height="32" fill="#1a1a1a"/>
+      <rect x="32" y="32" width="32" height="32" fill="#1a1a1a"/>
+      <rect x="16" y="16" width="32" height="32" fill="#4a4a4a"/>
+      <circle cx="32" cy="32" r="8" fill="#FF4500"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#ominous)"/>
+  <ellipse cx="256" cy="256" rx="120" ry="80" fill="#2F4F4F" stroke="#000" stroke-width="2"/>
+  <text x="256" y="480" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#000">SPORT GLOVES | OMINOUS</text>
+</svg> 

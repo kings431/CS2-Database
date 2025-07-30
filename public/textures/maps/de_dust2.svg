@@ -1,0 +1,13 @@
+<svg width="1024" height="1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="dust2" patternUnits="userSpaceOnUse" width="128" height="128">
+      <rect width="128" height="128" fill="#D2B48C"/>
+      <rect x="0" y="0" width="64" height="64" fill="#CD853F"/>
+      <rect x="64" y="64" width="64" height="64" fill="#CD853F"/>
+      <rect x="32" y="32" width="64" height="64" fill="#DEB887"/>
+      <circle cx="64" cy="64" r="16" fill="#8B4513"/>
+    </pattern>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#dust2)"/>
+  <text x="512" y="100" text-anchor="middle" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#8B4513">de_dust2</text>
+</svg> 

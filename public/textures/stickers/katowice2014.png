@@ -1,0 +1,12 @@
+# Placeholder for Katowice 2014 Sticker
+# 
+# This file should be replaced with an actual PNG sticker texture.
+# The sticker should be:
+# - Format: PNG with transparency (RGBA)
+# - Resolution: 256x256 or 512x512 pixels
+# - Content: Katowice 2014 tournament sticker design
+# - Alpha channel: Controls transparency for proper overlay
+# - UV mapping: Designed to be applied to specific weapon areas
+#
+# For development/testing, you can create a simple tournament logo
+# or download existing CS2 sticker textures from community sources. 

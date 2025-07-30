@@ -7,7 +7,11 @@ interface ScreenshotResult {
   name: string
   wear: string
   pattern: number
+  float: number
+  category: string
+  rarity: string
   imageUrl: string
+  inspectLink: string
   timestamp: string
 }
 
@@ -87,6 +91,17 @@ export default function ScreenshotTool() {
     return Math.min(float * 100, 100)
   }
 
+  const getRarityColor = (rarity: string) => {
+    switch (rarity.toLowerCase()) {
+      case 'contraband': return 'text-yellow-400'
+      case 'covert': return 'text-red-400'
+      case 'classified': return 'text-purple-400'
+      case 'restricted': return 'text-pink-400'
+      case 'mil-spec': return 'text-blue-400'
+      default: return 'text-gray-400'
+    }
+  }
+
   return (
     <div className="min-h-screen bg-gray-900 text-white p-6">
       <div className="max-w-4xl mx-auto">
@@ -141,7 +156,15 @@ export default function ScreenshotTool() {
           <div className="bg-gray-800 rounded-lg p-6">
             {/* Item Header */}
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">{result.name}</h2>
+              <div>
+                <h2 className="text-xl font-semibold">{result.name}</h2>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className={`px-2 py-1 rounded text-xs font-medium ${getRarityColor(result.rarity)} bg-gray-700`}>
+                    {result.rarity}
+                  </span>
+                  <span className="text-gray-400 text-sm capitalize">{result.category}</span>
+                </div>
+              </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={handleCopyLink}
@@ -170,13 +193,35 @@ export default function ScreenshotTool() {
             {/* Item Card */}
             <div className="bg-gray-700 rounded-lg p-6">
               <div className="flex gap-6">
-                {/* Image Section */}
+                {/* Skin Image Section */}
                 <div className="flex-1 relative">
-                  <img
-                    src={result.imageUrl}
-                    alt={result.name}
-                    className="w-full h-auto rounded"
-                  />
+                  <div className="w-full h-64 bg-gray-800 rounded flex items-center justify-center overflow-hidden">
+                    {result.imageUrl ? (
+                      <img
+                        src={result.imageUrl}
+                        alt={result.name}
+                        className="w-full h-full object-contain"
+                        onError={(e) => {
+                          // Fallback to placeholder if image fails to load
+                          const target = e.target as HTMLImageElement;
+                          target.style.display = 'none';
+                          const fallback = target.parentElement?.querySelector('.fallback') as HTMLElement;
+                          if (fallback) fallback.style.display = 'flex';
+                        }}
+                      />
+                    ) : null}
+                    {/* Fallback placeholder */}
+                    <div className="fallback hidden w-full h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-16 h-16 bg-gray-700 rounded-lg mx-auto mb-4 flex items-center justify-center">
+                          <svg className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m-9 0h10m-10 0a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V6a2 2 0 00-2-2" />
+                          </svg>
+                        </div>
+                        <p className="text-gray-400 text-sm">Image not available</p>
+                      </div>
+                    </div>
+                  </div>
                   {/* Temp Logo */}
                   <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs font-medium">
                     CS2DB
@@ -204,6 +249,11 @@ export default function ScreenshotTool() {
                         style={{ left: `${getWearBarPosition(result.wear)}%` }}
                       ></div>
                     </div>
+                  </div>
+
+                  <div>
+                    <label className="text-gray-400 text-sm">Float Value</label>
+                    <p className="text-lg font-medium">{result.float}</p>
                   </div>
                 </div>
               </div>
