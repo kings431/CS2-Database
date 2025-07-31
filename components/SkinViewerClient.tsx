@@ -6,6 +6,10 @@ import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import SkinViewerFallback from './SkinViewerFallback';
 import WeaponModel from './WeaponModel';
+import LightingControls from './LightingControls';
+import ScreenshotButtonInCanvas from './ScreenshotButtonInCanvas';
+import ScreenshotButtonOverlay from './ScreenshotButtonOverlay';
+
 
 interface SkinViewerProps {
   model?: string;
@@ -13,11 +17,27 @@ interface SkinViewerProps {
   float?: number;
   stickers?: (string | null)[];
   className?: string;
+  fov?: number;
+  scale?: number;
   // New props for screenshot integration
   itemName?: string;
   category?: string;
   wear?: string;
   pattern?: number;
+  // Full screen mode
+  fullScreen?: boolean;
+  // Background prop
+  background?: string;
+  // Screenshot functionality
+  onScreenshotTaken?: (permalink: string) => void;
+  // Lighting props
+  ambientIntensity?: number;
+  directionalIntensity?: number;
+  pointLight1Intensity?: number;
+  pointLight2Intensity?: number;
+  pointLight3Intensity?: number;
+  pointLight4Intensity?: number;
+  rimLightIntensity?: number;
 }
 
 // Weapon data structure
@@ -43,7 +63,7 @@ const WEAPONS: { [key: string]: WeaponData } = {
       { value: 'fire_serpent', label: 'Fire Serpent' },
       { value: 'dragon_lore', label: 'Dragon Lore' }
     ],
-    modelPath: '/models/weapons/ak47/ak-47.glb',
+    modelPath: '/models/weapons/ak47/weapon_rif_ak47.glb',
     geometry: [2.2, 0.15, 0.15],
     scale: 1.0,
     position: [0, 0, 0]
@@ -80,12 +100,21 @@ const WEAPONS: { [key: string]: WeaponData } = {
     type: 'knife',
     name: 'Karambit',
     skins: [
-      { value: 'fade', label: 'Fade' },
-      { value: 'marble_fade', label: 'Marble Fade' },
-      { value: 'doppler', label: 'Doppler' },
-      { value: 'tiger_tooth', label: 'Tiger Tooth' }
+      { value: 'crimson_web', label: 'Crimson Web' },
+      { value: 'stained', label: 'Stained' },
+      { value: 'case_hardened', label: 'Case Hardened' },
+      { value: 'blue_steel', label: 'Blue Steel' },
+      { value: 'tiger_tooth', label: 'Tiger Tooth' },
+      { value: 'rust_coat', label: 'Rust Coat' },
+      { value: 'damascus-steel', label: 'Damascus Steel' },
+      { value: 'gamma_doppler', label: 'Gamma Doppler' },
+      { value: 'autotronic', label: 'Autotronic' },
+      { value: 'lore', label: 'Lore' },
+      { value: 'freehand', label: 'Freehand' },
+      { value: 'bright_water', label: 'Bright Water' },
+      { value: 'black_laminate', label: 'Black Laminate' }
     ],
-    modelPath: '/models/karambit_realistic.glb',
+    modelPath: '/models/weapons/knives/karambit/weapon_knife_karambit.glb',
     geometry: [0.6, 0.08, 0.08],
     scale: 1.5,
     position: [0, 0, 0]
@@ -99,9 +128,9 @@ const WEAPONS: { [key: string]: WeaponData } = {
       { value: 'tiger_tooth', label: 'Tiger Tooth' },
       { value: 'ultraviolet', label: 'Ultraviolet' }
     ],
-    modelPath: '/models/m9_bayonet_realistic.glb',
-    geometry: [0.7, 0.08, 0.08],
-    scale: 1.3,
+    modelPath: '/models/weapons/knives/m9_bayonet/weapon_knife_m9.glb',
+    geometry: [0.6, 0.08, 0.08],
+    scale: 1.5,
     position: [0, 0, 0]
   },
   gloves_sport: {
@@ -110,9 +139,27 @@ const WEAPONS: { [key: string]: WeaponData } = {
     skins: [
       { value: 'ominous', label: 'Ominous' },
       { value: 'vice', label: 'Vice' },
-      { value: 'pandora', label: 'Pandora\'s Box' }
+      { value: 'pandora', label: 'Pandora\'s Box' },
+      { value: 'amphibious', label: 'Amphibious' },
+      { value: 'arid', label: 'Arid' },
+      { value: 'bronze_morph', label: 'Bronze Morph' },
+      { value: 'cobalt_skulls', label: 'Cobalt Skulls' },
+      { value: 'crimson_weave', label: 'Crimson Weave' },
+      { value: 'eclipse', label: 'Eclipse' },
+      { value: 'hedge_maze', label: 'Hedge Maze' },
+      { value: 'king_snake', label: 'King Snake' },
+      { value: 'lunar_weave', label: 'Lunar Weave' },
+      { value: 'mega_weave', label: 'Mega Weave' },
+      { value: 'moto_boomslang', label: 'Moto Boomslang' },
+      { value: 'nocts', label: 'Nocts' },
+      { value: 'pandora', label: 'Pandora\'s Box' },
+      { value: 'slingshot', label: 'Slingshot' },
+      { value: 'spearmint', label: 'Spearmint' },
+      { value: 'superconductor', label: 'Superconductor' },
+      { value: 'tiger_strike', label: 'Tiger Strike' },
+      { value: 'vice', label: 'Vice' }
     ],
-    modelPath: '/models/sport_gloves_realistic.glb',
+    modelPath: '/models/gloves/v_glove_hardknuckle.glb',
     geometry: [0.8, 0.4, 0.3],
     scale: 1.0,
     position: [0, 0, 0]
@@ -123,56 +170,86 @@ const WEAPONS: { [key: string]: WeaponData } = {
     skins: [
       { value: 'fade', label: 'Fade' },
       { value: 'crimson_kimono', label: 'Crimson Kimono' },
-      { value: 'emerald_web', label: 'Emerald Web' }
+      { value: 'emerald_web', label: 'Emerald Web' },
+      { value: 'bamboo_print', label: 'Bamboo Print' },
+      { value: 'blood_pressure', label: 'Blood Pressure' },
+      { value: 'blue_steel', label: 'Blue Steel' },
+      { value: 'case_hardened', label: 'Case Hardened' },
+      { value: 'cobalt_skulls', label: 'Cobalt Skulls' },
+      { value: 'crimson_weave', label: 'Crimson Weave' },
+      { value: 'emerald_web', label: 'Emerald Web' },
+      { value: 'fade', label: 'Fade' },
+      { value: 'field_agent', label: 'Field Agent' },
+      { value: 'foundation', label: 'Foundation' },
+      { value: 'forest_ddpat', label: 'Forest DDPAT' },
+      { value: 'free_hand', label: 'Free Hand' },
+      { value: 'green_web', label: 'Green Web' },
+      { value: 'lunar_weave', label: 'Lunar Weave' },
+      { value: 'mega_weave', label: 'Mega Weave' },
+      { value: 'mint_kimono', label: 'Mint Kimono' },
+      { value: 'orange_kimono', label: 'Orange Kimono' },
+      { value: 'pandora', label: 'Pandora\'s Box' },
+      { value: 'polygon', label: 'Polygon' },
+      { value: 'pow', label: 'POW!' },
+      { value: 'red_kimono', label: 'Red Kimono' },
+      { value: 'slaughters', label: 'Slaughter' },
+      { value: 'stained', label: 'Stained' },
+      { value: 'urban_hazard', label: 'Urban Hazard' },
+      { value: 'vice', label: 'Vice' }
     ],
-    modelPath: '/models/specialist_gloves_realistic.glb',
+    modelPath: '/models/gloves/v_glove_bloodhound.glb',
     geometry: [0.8, 0.4, 0.3],
     scale: 1.0,
     position: [0, 0, 0]
   }
 };
 
-// Available maps
-const MAPS = [
-  { value: 'de_dust2', label: 'de_dust2' },
-  { value: 'de_mirage', label: 'de_mirage' },
-  { value: 'de_inferno', label: 'de_inferno' },
-  { value: 'de_nuke', label: 'de_nuke' },
-  { value: 'de_overpass', label: 'de_overpass' }
+// Available backgrounds
+const BACKGROUNDS = [
+  { value: '', label: 'Default Gradient' },
+  { value: '/backgrounds/back1.jpg', label: 'Background 1' },
+  { value: '/backgrounds/back2.jpg', label: 'Background 2' },
+  { value: '/backgrounds/back3.jpg', label: 'Background 3' },
+  { value: '/backgrounds/back4.jpg', label: 'Background 4' },
+  { value: '/backgrounds/back5.png', label: 'Background 5' },
+  { value: '/backgrounds/gradient.png', label: 'Gradient' }
 ];
 
+// Pattern data for skins that support patterns
+const SKIN_PATTERNS: { [key: string]: { name: string; description: string; minPattern: number; maxPattern: number; examples?: string[] } } = {
+  'redline': { name: 'Redline', description: 'A classic red and black pattern.', minPattern: 1, maxPattern: 10 },
+  'asiimov': { name: 'Asiimov', description: 'A camouflage pattern.', minPattern: 1, maxPattern: 10 },
+  'vulcan': { name: 'Vulcan', description: 'A dark blue and black pattern.', minPattern: 1, maxPattern: 10 },
+  'fire_serpent': { name: 'Fire Serpent', description: 'A fiery red and black pattern.', minPattern: 1, maxPattern: 10 },
+  'dragon_lore': { name: 'Dragon Lore', description: 'A detailed dragon pattern.', minPattern: 1, maxPattern: 10 },
+  'howl': { name: 'Howl', description: 'A howling wolf pattern.', minPattern: 1, maxPattern: 10 },
+  'desolate_space': { name: 'Desolate Space', description: 'A dark blue and black pattern.', minPattern: 1, maxPattern: 10 },
+  'evolved': { name: 'Evolved', description: 'A detailed evolved pattern.', minPattern: 1, maxPattern: 10 },
+  'dragon_lore_awp': { name: 'Dragon Lore', description: 'A detailed dragon pattern.', minPattern: 1, maxPattern: 10 },
+  'medusa': { name: 'Medusa', description: 'A detailed medusa pattern.', minPattern: 1, maxPattern: 10 },
+  'fever_dream': { name: 'Fever Dream', description: 'A detailed fever dream pattern.', minPattern: 1, maxPattern: 10 },
+  'crimson_web': { name: 'Crimson Web', description: 'A detailed crimson web pattern.', minPattern: 1, maxPattern: 10 },
+  'stained': { name: 'Stained', description: 'A detailed stained pattern.', minPattern: 1, maxPattern: 10 },
+  'case_hardened': { name: 'Case Hardened', description: 'A detailed case hardened pattern.', minPattern: 1, maxPattern: 10 },
+  'blue_steel': { name: 'Blue Steel', description: 'A detailed blue steel pattern.', minPattern: 1, maxPattern: 10 },
+  'tiger_tooth': { name: 'Tiger Tooth', description: 'A detailed tiger tooth pattern.', minPattern: 1, maxPattern: 10 },
+  'rust_coat': { name: 'Rust Coat', description: 'A detailed rust coat pattern.', minPattern: 1, maxPattern: 10 },
+  'damascus-steel': { name: 'Damascus Steel', description: 'A detailed damascus steel pattern.', minPattern: 1, maxPattern: 10 },
+  'gamma_doppler': { name: 'Gamma Doppler', description: 'A detailed gamma doppler pattern.', minPattern: 1, maxPattern: 10 },
+  'autotronic': { name: 'Autotronic', description: 'A detailed autotronic pattern.', minPattern: 1, maxPattern: 10 },
+  'lore': { name: 'Lore', description: 'A detailed lore pattern.', minPattern: 1, maxPattern: 10 },
+  'freehand': { name: 'Freehand', description: 'A detailed freehand pattern.', minPattern: 1, maxPattern: 10 },
+  'bright_water': { name: 'Bright Water', description: 'A detailed bright water pattern.', minPattern: 1, maxPattern: 10 },
+  'black_laminate': { name: 'Black Laminate', description: 'A detailed black laminate pattern.', minPattern: 1, maxPattern: 10 },
+  'marble': { name: 'Marble Fade', description: 'A detailed marble fade pattern.', minPattern: 1, maxPattern: 10 },
+  'doppler': { name: 'Doppler', description: 'A detailed doppler pattern.', minPattern: 1, maxPattern: 10 },
+  'ultraviolet': { name: 'Ultraviolet', description: 'A detailed ultraviolet pattern.', minPattern: 1, maxPattern: 10 }
+};
 
 
-// Map background component
-const MapBackground: React.FC<{ mapPath?: string }> = ({ mapPath }) => {
-  const [texture, setTexture] = useState<THREE.Texture | null>(null);
-
-  useEffect(() => {
-    if (mapPath) {
-      const textureLoader = new THREE.TextureLoader();
-      textureLoader.load(
-        mapPath,
-        (loadedTexture) => {
-          loadedTexture.flipY = false;
-          setTexture(loadedTexture);
-        },
-        undefined,
-        (error) => {
-          console.warn('Failed to load map texture:', error);
-        }
-      );
-    }
-  }, [mapPath]);
-
-  return (
-    <mesh position={[0, -5, -10]} rotation={[-Math.PI / 2, 0, 0]}>
-      <planeGeometry args={[20, 20]} />
-      <meshBasicMaterial 
-        map={texture} 
-        color={texture ? 0xffffff : 0x8B7355}
-      />
-    </mesh>
-  );
+// Static background component - removed 3D background system
+const StaticBackground: React.FC = () => {
+  return null; // We'll handle background via CSS instead
 };
 
 // Map item name and category to model and skin
@@ -190,12 +267,38 @@ const mapItemToModel = (itemName: string, category: string): { model: string; sk
         return { model: 'knife_karambit', skin: 'marble_fade' };
       } else if (name.includes('doppler')) {
         return { model: 'knife_karambit', skin: 'doppler' };
+      } else if (name.includes('tiger tooth')) {
+        return { model: 'knife_karambit', skin: 'tiger_tooth' };
+      } else if (name.includes('black laminate')) {
+        return { model: 'knife_karambit', skin: 'black_laminate' };
+      } else if (name.includes('crimson web')) {
+        return { model: 'knife_karambit', skin: 'crimson_web' };
+      } else if (name.includes('stained')) {
+        return { model: 'knife_karambit', skin: 'stained' };
+      } else if (name.includes('case hardened')) {
+        return { model: 'knife_karambit', skin: 'case_hardened' };
+      } else if (name.includes('blue steel')) {
+        return { model: 'knife_karambit', skin: 'blue_steel' };
+      } else if (name.includes('rust coat')) {
+        return { model: 'knife_karambit', skin: 'rust_coat' };
+      } else if (name.includes('damascus steel')) {
+        return { model: 'knife_karambit', skin: 'damascus-steel' };
+      } else if (name.includes('gamma doppler')) {
+        return { model: 'knife_karambit', skin: 'gamma_doppler' };
+      } else if (name.includes('autotronic')) {
+        return { model: 'knife_karambit', skin: 'autotronic' };
+      } else if (name.includes('lore')) {
+        return { model: 'knife_karambit', skin: 'lore' };
+      } else if (name.includes('freehand')) {
+        return { model: 'knife_karambit', skin: 'freehand' };
+      } else if (name.includes('bright water')) {
+        return { model: 'knife_karambit', skin: 'bright_water' };
       } else {
         return { model: 'knife_karambit', skin: 'fade' }; // Default
       }
     } else if (name.includes('butterfly')) {
       return { model: 'knife_butterfly', skin: 'fade' };
-    } else if (name.includes('bayonet')) {
+    } else if (name.includes('bayonet') || name.includes('m9')) {
       return { model: 'knife_m9', skin: 'marble' };
     } else {
       return { model: 'knife_karambit', skin: 'fade' }; // Default knife
@@ -211,6 +314,8 @@ const mapItemToModel = (itemName: string, category: string): { model: string; sk
         return { model: 'ak47', skin: 'asiimov' };
       } else if (name.includes('fire serpent')) {
         return { model: 'ak47', skin: 'fire_serpent' };
+      } else if (name.includes('fade')) {
+        return { model: 'ak47', skin: 'fade' };
       } else {
         return { model: 'ak47', skin: 'redline' }; // Default
       }
@@ -265,10 +370,22 @@ const SkinViewerClient: React.FC<SkinViewerProps> = ({
   float = 0.0,
   stickers = [null, null, null, null],
   className = '',
+  fov = 60,
+  scale = 1.0,
   itemName,
   category,
   wear,
-  pattern
+  pattern,
+  fullScreen,
+  background,
+  onScreenshotTaken,
+  ambientIntensity = 0.6,
+  directionalIntensity = 1.2,
+  pointLight1Intensity = 0.4,
+  pointLight2Intensity = 0.3,
+  pointLight3Intensity = 0.5,
+  pointLight4Intensity = 0.6,
+  rimLightIntensity = 0.8
 }) => {
   // Map item data to model and skin if provided
   const mappedData = itemName && category ? mapItemToModel(itemName, category) : { model, skin };
@@ -279,10 +396,30 @@ const SkinViewerClient: React.FC<SkinViewerProps> = ({
   const [selectedWeapon, setSelectedWeapon] = useState(selectedModel);
   const [selectedSkinValue, setSelectedSkinValue] = useState(selectedSkin);
   const [selectedFloat, setSelectedFloat] = useState(wearValue);
+  const [selectedPattern, setSelectedPattern] = useState(pattern || 1);
   const [selectedStickers, setSelectedStickers] = useState<(string | null)[]>(stickers);
-  const [selectedMap, setSelectedMap] = useState('de_dust2');
+  const [selectedBackground, setSelectedBackground] = useState(background || '');
+  const [selectedFOV, setSelectedFOV] = useState(fov);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+
+
+  // Update state when props change
+  useEffect(() => {
+    setSelectedWeapon(selectedModel);
+    setSelectedSkinValue(selectedSkin);
+    setSelectedFloat(wearValue);
+    setSelectedPattern(pattern || 1);
+    setSelectedFOV(fov);
+    setSelectedBackground(background || '');
+    console.log('Background changed to:', background);
+  }, [selectedModel, selectedSkin, wearValue, pattern, fov, background]);
+
+  // Log background changes
+  useEffect(() => {
+    console.log('Selected background state:', selectedBackground);
+  }, [selectedBackground]);
 
   // Available stickers
   const availableStickers = [
@@ -292,161 +429,104 @@ const SkinViewerClient: React.FC<SkinViewerProps> = ({
     { value: 'mlg2015.svg', label: 'MLG 2015' }
   ];
 
+  // Get pattern information for current skin
+  const getPatternInfo = () => {
+    const skinName = selectedSkinValue;
+    const patternData = SKIN_PATTERNS[skinName as keyof typeof SKIN_PATTERNS];
+    
+    if (patternData) {
+      return {
+        name: patternData.name,
+        description: patternData.description,
+        minPattern: patternData.minPattern,
+        maxPattern: patternData.maxPattern,
+        currentPattern: selectedPattern,
+        examples: patternData.examples || []
+      };
+    }
+    return null;
+  };
+
+  const patternInfo = getPatternInfo();
+
   const weaponData = WEAPONS[selectedWeapon] || WEAPONS.ak47;
-  const skinPath = selectedSkin ? `/textures/skins/${selectedWeapon}_${selectedSkin}.svg` : undefined;
-  const mapPath = selectedMap ? `/textures/maps/${selectedMap}.svg` : undefined;
 
-  return (
-    <div className={`w-full h-full min-h-[600px] bg-gray-900 rounded-lg overflow-hidden ${className}`}>
+    return (
+    <div className={`w-full h-full ${fullScreen ? 'fixed inset-0 z-50' : 'min-h-[600px]'} bg-gray-900 ${fullScreen ? '' : 'rounded-lg overflow-hidden'} ${className}`}>
       {/* 3D Canvas */}
-      <div className="w-full h-[500px] relative">
+      <div className={`w-full h-full relative`}>
+        <ScreenshotButtonOverlay
+          weaponType={selectedWeapon}
+          skin={selectedSkinValue}
+          float={selectedFloat}
+          background={selectedBackground}
+          fov={selectedFOV}
+        />
         <Canvas
-          camera={{ position: [0, 0, 2], fov: 75 }}
-          style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}
+          camera={{ position: [0, 0, 4], fov: selectedFOV }}
+          style={{ 
+            background: selectedBackground 
+              ? `url(${selectedBackground}) center/cover no-repeat`
+              : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)'
+          }}
+          onCreated={({ camera }) => {
+            console.log('Canvas created with camera:', camera);
+            console.log('Canvas background style:', selectedBackground 
+              ? `url(${selectedBackground}) center/cover no-repeat`
+              : 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)');
+          }}
         >
-          <ambientLight intensity={0.6} />
-          <directionalLight position={[10, 10, 5]} intensity={1.2} />
-          <pointLight position={[-5, 5, 5]} intensity={0.4} color="#4a90e2" />
-          <pointLight position={[5, -5, -5]} intensity={0.3} color="#e24a4a" />
+          <LightingControls
+            ambientIntensity={ambientIntensity}
+            directionalIntensity={directionalIntensity}
+            pointLight1Intensity={pointLight1Intensity}
+            pointLight2Intensity={pointLight2Intensity}
+            pointLight3Intensity={pointLight3Intensity}
+            pointLight4Intensity={pointLight4Intensity}
+            rimLightIntensity={rimLightIntensity}
+          />
 
-          <Suspense fallback={null}>
-            <MapBackground mapPath={mapPath} />
+          <Suspense fallback={
+            <mesh geometry={new THREE.BoxGeometry(1, 1, 1)}>
+              <meshStandardMaterial color={0x808080} />
+            </mesh>
+          }>
             <WeaponModel 
               weaponType={selectedWeapon}
-              skinPath={skinPath} 
+              skinPath={`${selectedSkinValue}_${selectedPattern}`} // Pass skin name with pattern
               float={selectedFloat}
               stickers={selectedStickers}
               position={weaponData.position}
-              scale={weaponData.scale}
+              scale={weaponData.scale * scale}
             />
             <OrbitControls
-              enablePan={false}
+              enablePan={true}
               enableZoom={true}
               enableRotate={true}
-              minDistance={1.5}
-              maxDistance={5}
-              maxPolarAngle={Math.PI / 2}
+              minDistance={0.5}
+              maxDistance={20}
               minPolarAngle={0}
+              maxPolarAngle={Math.PI}
+              zoomSpeed={1.5}
+              rotateSpeed={0.8}
+              panSpeed={1.0}
+              dampingFactor={0.05}
+              enableDamping={true}
             />
+            
+            {/* Screenshot Button Inside Canvas */}
+            <ScreenshotButtonInCanvas
+              weaponType={selectedWeapon}
+              skin={selectedSkinValue}
+              float={selectedFloat}
+              background={selectedBackground}
+              fov={selectedFOV}
+            />
+
           </Suspense>
         </Canvas>
       </div>
 
-      {/* Controls Panel */}
-      <div className="p-6 bg-gray-800 border-t border-gray-700">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          {/* Weapon Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Weapon
-            </label>
-            <select
-              value={selectedWeapon}
-              onChange={(e) => {
-                setSelectedWeapon(e.target.value);
-                setSelectedSkinValue(WEAPONS[e.target.value]?.skins[0]?.value || 'redline');
-              }}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-            >
-              {Object.entries(WEAPONS).map(([key, weapon]) => (
-                <option key={key} value={key}>
-                  {weapon.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Skin Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Skin
-            </label>
-            <select
-              value={selectedSkinValue}
-              onChange={(e) => setSelectedSkinValue(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-            >
-              {weaponData.skins.map((skinOption) => (
-                <option key={skinOption.value} value={skinOption.value}>
-                  {skinOption.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Map Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Map
-            </label>
-            <select
-              value={selectedMap}
-              onChange={(e) => setSelectedMap(e.target.value)}
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-            >
-              {MAPS.map((map) => (
-                <option key={map.value} value={map.value}>
-                  {map.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Float/Wear Slider */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">
-              Wear (Float: {selectedFloat.toFixed(2)})
-            </label>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={selectedFloat}
-              onChange={(e) => setSelectedFloat(parseFloat(e.target.value))}
-              className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer slider"
-            />
-          </div>
-        </div>
-
-        {/* Sticker Selection */}
-        <div className="mt-4">
-          <label className="block text-sm font-medium text-gray-300 mb-2">
-            Stickers
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-            {[0, 1, 2, 3].map((index) => (
-              <select
-                key={index}
-                value={selectedStickers[index] || ''}
-                onChange={(e) => {
-                  const newStickers = [...selectedStickers];
-                  newStickers[index] = e.target.value || null;
-                  setSelectedStickers(newStickers);
-                }}
-                className="px-2 py-1 text-xs bg-gray-700 border border-gray-600 rounded text-white focus:outline-none focus:ring-1 focus:ring-blue-500 transition-colors"
-              >
-                <option value="">None</option>
-                {availableStickers.map((sticker) => (
-                  <option key={sticker.value} value={sticker.value}>
-                    {sticker.label}
-                  </option>
-                ))}
-              </select>
-            ))}
-          </div>
-        </div>
-
-        {/* Model Info */}
-        <div className="mt-4 pt-4 border-t border-gray-700">
-          <div className="flex justify-between text-sm text-gray-400">
-            <span className="font-medium">Weapon: {weaponData.name}</span>
-            <span className="font-medium">Skin: {selectedSkinValue}</span>
-            <span className="font-medium">Map: {selectedMap}</span>
-            <span className="font-medium">Float: {selectedFloat.toFixed(2)}</span>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -5,6 +5,7 @@ interface SkinViewerFallbackProps {
   skin: string;
   float: number;
   stickers: (string | null)[];
+  fov?: number;
   // New props for screenshot integration
   itemName?: string;
   category?: string;
@@ -17,6 +18,7 @@ const SkinViewerFallback: React.FC<SkinViewerFallbackProps> = ({
   skin,
   float,
   stickers,
+  fov,
   itemName,
   category,
   wear,

@@ -1,1 +1,14 @@
-{}
+{
+  "app\\viewer\\page.tsx -> ../../components/SkinViewer": {
+    "id": "app\\viewer\\page.tsx -> ../../components/SkinViewer",
+    "files": [
+      "static/chunks/_app-pages-browser_components_SkinViewer_tsx.js"
+    ]
+  },
+  "components\\SkinViewer.tsx -> ./SkinViewerClient": {
+    "id": "components\\SkinViewer.tsx -> ./SkinViewerClient",
+    "files": [
+      "static/chunks/_app-pages-browser_components_SkinViewerClient_tsx.js"
+    ]
+  }
+}

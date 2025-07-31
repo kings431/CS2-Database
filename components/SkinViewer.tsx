@@ -9,11 +9,25 @@ interface SkinViewerProps {
   float?: number;
   stickers?: (string | null)[];
   className?: string;
+  fov?: number;
+  scale?: number;
   // New props for screenshot integration
   itemName?: string;
   category?: string;
   wear?: string;
   pattern?: number;
+  // Full screen mode
+  fullScreen?: boolean;
+  // Background prop
+  background?: string;
+  // Lighting props
+  ambientIntensity?: number;
+  directionalIntensity?: number;
+  pointLight1Intensity?: number;
+  pointLight2Intensity?: number;
+  pointLight3Intensity?: number;
+  pointLight4Intensity?: number;
+  rimLightIntensity?: number;
 }
 
 // Client-only wrapper component
@@ -47,6 +61,7 @@ const ClientOnlySkinViewer: React.FC<SkinViewerProps> = (props) => {
         skin={props.skin || 'redline'}
         float={props.float || 0.0}
         stickers={props.stickers || [null, null, null, null]}
+        fov={props.fov || 60}
         itemName={props.itemName}
         category={props.category}
         wear={props.wear}
